@@ -3,14 +3,16 @@ const admin = require('firebase-admin');
 
 admin.initializeApp();
 
-exports.lowercaseProductName = functions.firestore.document('/products/{documentId}')
-    .onCreate((snap, context) => {
-        const name = snap.data().name;
+exports.lowercaseProductName = functions.firestore
+  .document('products/{documentId}')
+  .onCreate((snap, context) => {
+    const data = snap.data();
+    const { documentId } = context.params;
 
-        functions.logger.log('Lowercasing product name', context.params.documentId, name);
+    const lowercaseName = data.name.toLowerCase();
 
-        const lowercaseName = name.toLowerCase();
-
-        return snap.ref.set({ name_lower: lowercaseName }, { merge: true });
-    });
-
+    return snap.ref.set(
+      { name_lower: lowercaseName },
+      { merge: true }
+    );
+  });
